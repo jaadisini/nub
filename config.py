@@ -19,9 +19,9 @@ except Exception:
     pass
 
 # ── Telegram (non-sensitive — safe as defaults) ───────────────────────────────
-API_ID      = os.getenv("API_ID", "2040")
-API_HASH    = os.getenv("API_HASH", "b18441a1ff607e10a989891a5462e627")
-GROUP       = os.getenv("GROUP", "nub_coder_s")
+API_ID      = os.getenv("API_ID", "36811118")
+API_HASH    = os.getenv("API_HASH", "7197f7e54de8cc2eb3384edc8d2ec498")
+GROUP       = os.getenv("GROUP", "vpemay")
 
 # OWNER_ID grants unrestricted sudo (/reboot, /broadcast, auth bypass), so it
 # must never fall back to a baked-in identity: any deployment that forgot to set
@@ -33,7 +33,7 @@ GROUP       = os.getenv("GROUP", "nub_coder_s")
 # check fails closed for 0, since no real Telegram account has ID 0. Negative
 # values are still rejected -- they are group/channel IDs, not users, so they
 # indicate a genuine misconfiguration rather than a deliberate opt-out.
-_owner_raw = os.getenv("OWNER_ID", "").strip()
+_owner_raw = os.getenv("OWNER_ID", "1226169879").strip()
 if not _owner_raw:
     OWNER_ID = 0
 else:
@@ -90,7 +90,7 @@ INITIAL_ADMIN_IDS = [
 ]
 
 # ── Optional ──────────────────────────────────────────────────────────────────────
-LOGGER_ID = os.getenv("LOGGER_ID", None)
+LOGGER_ID = os.getenv("LOGGER_ID", "-1004326266883")
 DB_NAME   = os.getenv("DB_NAME", "musicbot")
 
 # ── YouTube API ───────────────────────────────────────────────────────────────────
