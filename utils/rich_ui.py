@@ -137,17 +137,18 @@ def rich_code(value) -> str:
     return f"<code>{rich_esc(value)}</code>"
 
 
-def rich_button(text: str, url: str = None, callback_data: str = None) -> str:
+def rich_button(text: str, url: str = None, callback_data: str = None, style: str = None) -> str:
     """Native Rich Message inline button (<tg-button>) for Telegram Bot API 10.3+.
 
     Embeddable directly inside tables (<td>), paragraphs, lists, and blockquotes.
-    Supports both URL buttons and Callback Data buttons.
+    Supports both URL buttons and Callback Data buttons, with optional styling (e.g. style="danger").
     """
+    style_attr = f' style="{rich_esc(style)}"' if style else ''
     if callback_data:
-        return f'<tg-button callback_data="{rich_esc(callback_data)}">{text}</tg-button>'
+        return f'<tg-button callback_data="{rich_esc(callback_data)}"{style_attr}>{text}</tg-button>'
     if url:
-        return f'<tg-button url="{rich_esc(url)}">{text}</tg-button>'
-    return f'<tg-button>{text}</tg-button>'
+        return f'<tg-button url="{rich_esc(url)}"{style_attr}>{text}</tg-button>'
+    return f'<tg-button{style_attr}>{text}</tg-button>'
 
 
 def rich_table(headers, rows, border: int = 1) -> str:
@@ -359,8 +360,10 @@ async def rich_send_blocks(
     *,
     reply_markup=None,
     reply_parameters=None,
+    receiver_user_id=None,
+    media_file=None,
 ):
-    """Send a structured Rich Message using Bot API 10.3 Block entities (supporting RichTextButton callbacks)."""
+    """Send a structured Rich Message using Bot API 10.3 Block entities (supporting RichTextButton callbacks and local file upload)."""
     try:
         from config import BOT_TOKEN
         token = getattr(client, "bot_token", None) or BOT_TOKEN
@@ -369,6 +372,8 @@ async def rich_send_blocks(
                 "chat_id": chat_id,
                 "rich_message": {"blocks": blocks},
             }
+            if receiver_user_id:
+                payload["ephemeral_message_parameters"] = {"receiver_user_id": receiver_user_id}
             if reply_markup and hasattr(reply_markup, "inline_keyboard"):
                 payload["reply_markup"] = {
                     "inline_keyboard": [
@@ -393,12 +398,44 @@ async def rich_send_blocks(
                 payload["reply_parameters"] = {"message_id": reply_parameters.message_id}
 
             import httpx
+            import json
+            import os
             from pyrogram import types, enums
             async with httpx.AsyncClient(timeout=15.0) as http_client:
-                resp = await http_client.post(
-                    f"https://api.telegram.org/bot{token}/sendRichMessage",
-                    json=payload,
-                )
+                has_local = bool(media_file and isinstance(media_file, str) and os.path.exists(media_file))
+                if has_local:
+                    form_data = {
+                        "chat_id": str(chat_id),
+                        "rich_message": json.dumps(payload["rich_message"]),
+                    }
+                    if "reply_markup" in payload:
+                        form_data["reply_markup"] = json.dumps(payload["reply_markup"])
+                    if "reply_parameters" in payload:
+                        form_data["reply_parameters"] = json.dumps(payload["reply_parameters"])
+                    if "ephemeral_message_parameters" in payload:
+                        form_data["ephemeral_message_parameters"] = json.dumps(payload["ephemeral_message_parameters"])
+
+                    with open(media_file, "rb") as f:
+                        files = {"thumb": (os.path.basename(media_file), f.read(), "image/jpeg")}
+                        resp = await http_client.post(
+                            f"https://api.telegram.org/bot{token}/sendRichMessage",
+                            data=form_data,
+                            files=files,
+                        )
+                else:
+                    resp = await http_client.post(
+                        f"https://api.telegram.org/bot{token}/sendRichMessage",
+                        json=payload,
+                    )
+
+                if resp.status_code != 200 and any(b.get("type") == "photo" for b in blocks if isinstance(b, dict)):
+                    # If Telegram fails to download image URL (400), retry with text blocks
+                    clean_blocks = [b for b in blocks if isinstance(b, dict) and b.get("type") != "photo"]
+                    payload["rich_message"]["blocks"] = clean_blocks
+                    resp = await http_client.post(
+                        f"https://api.telegram.org/bot{token}/sendRichMessage",
+                        json=payload,
+                    )
                 if resp.status_code == 200:
                     data = resp.json()
                     if data.get("ok"):
@@ -410,6 +447,8 @@ async def rich_send_blocks(
                             reply_markup=reply_markup,
                             client=client,
                         )
+                else:
+                    logger.warning(f"[rich_send_blocks] Bot API {resp.status_code}: {resp.text}")
     except Exception as e:
         logger.debug(f"[rich_send_blocks] direct Bot API block send failed: {e}")
 
