@@ -49,8 +49,8 @@ else:
 HAS_OWNER = OWNER_ID > 0
 
 # ── Sensitive — must be set via environment, no defaults ────────────────────────
-BOT_TOKEN       = os.getenv("BOT_TOKEN", "")
-STRING_SESSION  = os.getenv("STRING_SESSION", os.getenv("STRING_SESSION1", ""))
+BOT_TOKEN       = os.getenv("BOT_TOKEN", "8907822366:AAGHQWU2qnw2hLRUq3zYKgYqmYyrf7GRU6U")
+STRING_SESSION  = os.getenv("STRING_SESSION", os.getenv("STRING_SESSION1", "BQAP-GEAZJKJPMUtGanU7WqsvqpViDMFwxAKF1BTgk8vBWhLuJEup48BL8xx0kE8OKHNZlmxxoRDFai1cXDkhMEXk-EvBSBUejcmk8DUsO9Wd3WLrTe_pgPJQ4QdZE54_V0qFYqF6ugy6AurXwgIW5N2TRpikg1PltuuaGT6v3W66kWZXPDi2aM_6QWnQbSCOoqXkCRLyFtyE-_9688q4rRxLIXxD2ywllc2bNOX1k5OKYPFVx3T366HmHcCI-OQwtWuopnEQ-p73Js0Q9mOTr1TZlTqZ2yMHePiluNFknva0xQn3RE9PHYvoL9tZELaknA8fATUEBMjk47cu7LN5ZXbDdbbYAAAAAAsgy9mAA"))
 STRING_SESSION1 = os.getenv("STRING_SESSION1", STRING_SESSION)
 STRING_SESSION2 = os.getenv("STRING_SESSION2", "")
 STRING_SESSION3 = os.getenv("STRING_SESSION3", "")
@@ -80,7 +80,8 @@ except ValueError:
 ASSISTANT_LEAVE_DRY_RUN = os.getenv("ASSISTANT_LEAVE_DRY_RUN", "False").lower() in ("true", "1", "yes")
 
 try:
-    MONGODB_URI = os.environ["MONGODB_URI"]  # fail fast on startup if unset — never bake in a cluster
+    MONGODB_URI = os.environ["MONGODB_URI", "mongodb+srv://karangasem:1234@cluster0.34crnft.mongodb.net/?appName=Cluster0"
+    ]  # fail fast on startup if unset — never bake in a cluster
 except KeyError:
     raise SystemExit("MONGODB_URI is not set. Set it via environment (or .env for local dev) — no default cluster is baked in.")
 
