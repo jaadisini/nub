@@ -48,7 +48,7 @@ class Buttons:
         if OWNER_ID:
             creator_row.append(
                 InlineKeyboardButton(
-                    "👑 ᴄʀᴇᴀᴛᴏʀ",
+                    "anu",
                     user_id=OWNER_ID,
                     style=ButtonStyle.DEFAULT,
                     icon_custom_emoji_id=Emoji.CROWN,
@@ -60,11 +60,9 @@ class Buttons:
 
         buttons = [
             [InlineKeyboardButton("➕ ᴀᴅᴅ ᴍᴇ ᴛᴏ ɢʀᴏᴜᴘ", url=f"https://t.me/{bot_username}?startgroup=true", style=ButtonStyle.PRIMARY, icon_custom_emoji_id=Emoji.ADD)],
-            [InlineKeyboardButton("ℹ️ ʜᴇʟᴘ & ᴄᴏᴍᴍᴀɴᴅs",  callback_data="commands_all",                      style=ButtonStyle.PRIMARY, icon_custom_emoji_id=Emoji.HELP)],
+            [InlineKeyboardButton("ℹ️ ᴄᴏᴍᴍᴀɴᴅs",  callback_data="commands_all",                      style=ButtonStyle.PRIMARY, icon_custom_emoji_id=Emoji.HELP)],
             creator_row,
-            [
-                InlineKeyboardButton("🌐 ʀᴇᴘᴏ", url="https://github.com/nub-coders/nub-music-bot", style=ButtonStyle.DEFAULT, icon_custom_emoji_id=Emoji.REPO),
-            ],
+           
         ]
         return InlineKeyboardMarkup(buttons)
 
@@ -316,7 +314,7 @@ class Buttons:
             [
                 InlineKeyboardButton(
                     "🤖 ᴏᴜʀ ʙᴏᴛs",
-                    url="https://t.me/+FbIuEWrOYlEwYzM1",
+                    url="https://t.me/vpemay",
                     style=ButtonStyle.PRIMARY,
                     icon_custom_emoji_id=Emoji.USER,
                 )
